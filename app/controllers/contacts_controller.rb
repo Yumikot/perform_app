@@ -2,7 +2,7 @@ class ContactsController < ApplicationController
   before_action :set_contact, only: [:show, :edit, :update, :destroy]
 
   def index
-    @contacts = Contact.all
+    
   end
 
   
@@ -21,18 +21,14 @@ class ContactsController < ApplicationController
   
   def create
     @contact = Contact.new(contact_params)
-
-    respond_to do |format|
-      if @contact.save
-        format.html { redirect_to @contact, notice: 'Contact was successfully created.' }
-        format.json { render :show, status: :created, location: @contact }
-      else
-        format.html { render :new }
-        format.json { render json: @contact.errors, status: :unprocessable_entity }
-      end
-    end
-  
+    if @contact.save
+      ContactMailer.contact_mail(@contact).deliver
+      redirect_to contacts_path, notice:'お問い合わせが完了しました'
+    else
+      redirect_to new_contact_path
   end
+  
+end
 
   
   def update
